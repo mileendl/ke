@@ -1,0 +1,84 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div th:replace="../views/header :: header"></div>
+<div class="container">
+    <h2 class="text-info">Создайте новый спиок</h2>
+    <form action="#" method="post"
+        th:object="${shoppingList}" th:action="@{create_list}">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+        <input type="hidden" th:field="*{id}">
+
+        <label for="name">Название</label>
+        <input id="name" class="form-control" th:field="*{name}"/>
+        <p th:if="${#fields.hasErrors('name')}"
+           class="text-danger"
+           th:errors="${shoppingList.name}">
+                    <span th:each="err: ${#fields.errors('name')}" th:text="#{${err}}"
+                          class="text-danger"></span></span>
+        </p>
+
+        <label for="date">Дата</label>
+        <input id="date" class="form-control" type="date" data-date-format="dd/mm/yyyy"
+               th:field="*{date}"
+               th:errorclass="fieldError"/>
+        <p th:if="${#fields.hasErrors('date')}"
+           class="text-danger"
+           th:errors="${shoppingList.date}">
+                    <span th:each="err: ${#fields.errors('date')}" th:text="#{${err}}"
+                          class="text-danger"></span></span>
+        </p>
+
+        <div>
+            <h4 class="text-info">Товары</h4>
+            <table>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Название</th>
+                    <th>Количество</th>
+                    <th>
+                        <button type="submit" class="btn btn-secondary btn-sm" name="addItem">Добавить</button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item, itemStat : *{items}">
+                    <td th:text="${itemStat.count}">1</td>
+                    <td>
+                        <select class="form-control" th:field="*{items[__${itemStat.index}__].item}"
+                                th:errorclass="fieldError">
+                            <option th:each="itemOption :${items}"
+                                    th:value="${itemOption.getId()}"
+                                    th:text="${itemOption.getName()}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" th:field="*{items[__${itemStat.index}__].quantity}"
+                               th:errorclass="fieldError" type="number" min="1"/>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-danger btn-sm" name="removeItem"
+                                th:value="${itemStat.index}">
+                            Удалить
+                        </button>
+                    </td>
+                    <td>
+                        <span th:errors="*{items[__${itemStat.index}__].item}">
+                            <span th:each="err: ${#fields.allErrors()()}" th:text="#{${err}}"
+                                  class="text-danger"></span>
+                        </span>
+                        <span th:errors="*{items[__${itemStat.index}__].quantity}">
+                            <span th:each="err: ${#fields.allErrors()()}" th:text="#{${err}}"
+                                  class="text-danger"></span>
+                        </span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-primary" name="save">Сохранить</button>
+        <button type="submit" class="btn btn-danger" name="delete">Удалить</button>
+    </form>
+</div>
+{% endblock %}
